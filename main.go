@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -32,6 +33,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	certFile := "server.crt"
+	keyFile := "server.key"
+
+	if os.Getenv("RUNNING_IS_DOCKER") == "true" {
+		certFile = "/app/ssl/server.crt"
+		keyFile = "/app/ssl/server.key"
+	}
+
 	// HTTPS サーバーの設定
 	server := &http.Server{
 		Addr: ":443",
@@ -45,9 +54,7 @@ func main() {
 	fmt.Println("Starting server on https://localhost:443")
 
 	// サーバー開始とエラーログ出力
-	if err := server.ListenAndServeTLS(
-		"/app/ssl/server.crt",
-		"/app/ssl/server.key"); err != nil {
+	if err := server.ListenAndServeTLS(certFile, keyFile); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
 }

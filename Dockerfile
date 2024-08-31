@@ -17,6 +17,8 @@ RUN go build -o main .
 
 FROM alpine:latest
 
+ENV RUNNING_IS_DOCKER=true
+
 COPY --from=builder /app/main /app/
 COPY --from=builder /app/ssl/server.crt /app/ssl/
 COPY --from=builder /app/ssl/server.key /app/ssl/
