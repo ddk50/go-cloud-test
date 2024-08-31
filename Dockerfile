@@ -23,6 +23,6 @@ COPY --from=builder /app/main /app/
 COPY --from=builder /app/ssl/server.crt /app/ssl/
 COPY --from=builder /app/ssl/server.key /app/ssl/
 
-EXPOSE 443
+EXPOSE 8080
 
 CMD ["/app/main"]

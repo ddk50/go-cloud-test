@@ -1,12 +1,11 @@
 package main
 
 import (
-	"crypto/tls"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -33,28 +32,19 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	certFile := "./ssl/server.crt"
-	keyFile := "./ssl/server.key"
-
-	if os.Getenv("RUNNING_IS_DOCKER") == "true" {
-		certFile = "/app/ssl/server.crt"
-		keyFile = "/app/ssl/server.key"
+	port := "8080"
+	if envPort := os.Getenv("PORT"); envPort != "" {
+		if _, err := strconv.Atoi(envPort); err != nil {
+			port = envPort
+		} else {
+			log.Printf("Invalid PORT environment variable value: %s, using default port %s", envPort, port)
+		}
 	}
 
-	// HTTPS サーバーの設定
-	server := &http.Server{
-		Addr: ":443",
-		TLSConfig: &tls.Config{
-			MinVersion: tls.VersionTLS12,
-		},
-		Handler:  http.HandlerFunc(handler),
-		ErrorLog: log.New(log.Writer(), "HTTPS Server: ", log.LstdFlags|log.Lshortfile),
-	}
+	http.HandleFunc("/", handler)
 
-	fmt.Println("Starting server on https://localhost:443")
-
-	// サーバー開始とエラーログ出力
-	if err := server.ListenAndServeTLS(certFile, keyFile); err != nil {
+	log.Printf("Starting server on http://localhost:%s", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
 }
