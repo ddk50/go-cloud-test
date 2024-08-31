@@ -33,8 +33,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	certFile := "server.crt"
-	keyFile := "server.key"
+	certFile := "./ssl/server.crt"
+	keyFile := "./ssl/server.key"
 
 	if os.Getenv("RUNNING_IS_DOCKER") == "true" {
 		certFile = "/app/ssl/server.crt"
